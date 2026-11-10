@@ -15,13 +15,13 @@ Downloads every IP range file listed in the dataset and returns them keyed by UR
 
 - **When to call it:** call it once, then refresh about daily in long-running processes.
 - **Failed files:** a file that fails to download or contains no ranges is skipped. Requests from that operator then come back unverified rather than flagged.
-- **Cloudflare Workers:** call it inside the request handler, not at module scope.
+- **Cloudflare Workers:** call it inside the request handler, not at module scope, and cache the promise so concurrent requests share one download.
 
 ```js
 let ipRanges
 
 async function handle(request) {
-  ipRanges ??= await loadIpRanges()
-  return classify({ headers: request.headers, ip: request.headers.get('cf-connecting-ip') }, { ipRanges })
+  ipRanges ??= loadIpRanges()
+  return classify({ headers: request.headers, ip: request.headers.get('cf-connecting-ip') }, { ipRanges: await ipRanges })
 }
 ```

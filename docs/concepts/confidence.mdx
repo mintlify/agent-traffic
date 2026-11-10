@@ -6,7 +6,7 @@ description: "What high, medium and low confidence mean."
 | Confidence | When |
 |---|---|
 | `high` | An IP verified the identity, an IP proved an impersonator, or a non-Chromium browser sent `sec-ch-ua` |
-| `medium` | A known user agent or `Accept` fingerprint, a markdown-first `Accept`, a generic HTTP client, a browser missing `sec-fetch-*`, or a browser with consistent headers |
+| `medium` | A known user agent or `Accept` fingerprint, a markdown-first `Accept`, a generic HTTP client, a browser asking for metalink downloads, a browser missing `sec-fetch-*`, or a browser with consistent headers |
 | `low` | An unverified `Signature-Agent`, a browser missing `Accept-Language` or ranking `text/plain` first, a browser whose headers weren't checked, or a fallback guess |
 
 Confidence describes the classification. `verified` describes the identity: whether an IP check confirmed that the request really comes from the operator it names. For security decisions, read `verified`, not only `confidence`.

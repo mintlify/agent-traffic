@@ -9,7 +9,7 @@ User agents and headers are set by the client, so anyone can claim to be GPTBot.
 |---|---|---|
 | Verified | The IP is inside the operator's published ranges | `verified: true`, confidence `high` |
 | Impersonator | The IP is outside the ranges, and the range file is current | `category: 'bot'`, `kind: 'impersonator'`, `verified: false` |
-| Unverified | No IP, an IP that isn't a single valid address, no published ranges, or a range file that's empty or older than 180 days | The claim is accepted with `verified: null` |
+| Unverified | No IP, an IP that isn't a single valid address, no published ranges or an empty range file, or an IP outside a range file older than `maxRangeAgeDays` (180 by default) | The claim is accepted with `verified: null` |
 
 An unusable input never turns a real crawler into a suspected fake.
 
