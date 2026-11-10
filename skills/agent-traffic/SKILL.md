@@ -15,7 +15,7 @@ Read these before writing anything:
 - [`data/agents.json`](https://github.com/mintlify/agent-traffic/blob/main/data/agents.json) lists known agents and crawlers: user agent patterns, `Accept` and `Signature-Agent` fingerprints, verification sources and real example user agents.
 - [`data/http-clients.json`](https://github.com/mintlify/agent-traffic/blob/main/data/http-clients.json) lists generic HTTP libraries and headless browsers.
 
-If the package is installed, the same data is at `node_modules/agent-traffic/dist/data/`. Every pattern is a case-insensitive regular expression.
+If the package is installed, the same data is at `node_modules/@mintlify/agent-traffic/dist/data/`. Every pattern is a case-insensitive regular expression.
 
 ## 1. Find out what's available
 
