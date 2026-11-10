@@ -1,0 +1,70 @@
+---
+title: "Request-time classification"
+description: "Classify requests where they arrive, with headers and the real client IP."
+---
+
+Classify at the first hop that sees the real request, usually your CDN or edge worker. Later hops lose the client IP, the `sec-*` headers and any signatures.
+
+<Tabs>
+  <Tab title="Cloudflare Workers">
+    ```js
+    import { classify, loadIpRanges } from '@mintlify/agent-traffic'
+
+    let ipRanges
+
+    export default {
+      async fetch(request) {
+        ipRanges ??= await loadIpRanges()
+
+        const result = classify(
+          { headers: request.headers, ip: request.headers.get('cf-connecting-ip') },
+          { ipRanges, headersComplete: true }
+        )
+
+        return fetch(request)
+      }
+    }
+    ```
+
+    Workers don't allow `fetch` at global scope, so the ranges load on the first request.
+  </Tab>
+  <Tab title="Next.js middleware">
+    ```js
+    import { NextResponse } from 'next/server'
+    import { classify } from '@mintlify/agent-traffic'
+
+    export function middleware(request) {
+      const result = classify({ headers: request.headers })
+
+      const response = NextResponse.next()
+      response.headers.set('x-traffic-category', result.category)
+      return response
+    }
+    ```
+  </Tab>
+  <Tab title="Express">
+    ```js
+    import express from 'express'
+    import { classify, loadIpRanges } from '@mintlify/agent-traffic'
+
+    const app = express()
+    let ipRanges = await loadIpRanges()
+    setInterval(async () => (ipRanges = await loadIpRanges()), 24 * 60 * 60 * 1000)
+
+    app.use((req, res, next) => {
+      res.locals.traffic = classify({ headers: req.headers, ip: req.ip }, { ipRanges })
+      next()
+    })
+    ```
+
+    Set `app.set('trust proxy', …)` so `req.ip` is the real client, not your load balancer.
+  </Tab>
+</Tabs>
+
+## Store the result
+
+If the result feeds analytics, store `category`, `kind`, `id` and `verified` with the request. To re-classify later, also keep:
+
+- the user agent;
+- the exact `Accept` value;
+- whether `sec-fetch-mode`, `sec-ch-ua`, `accept-language`, `signature` and `signature-agent` were present.

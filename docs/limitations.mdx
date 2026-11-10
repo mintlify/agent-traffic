@@ -1,0 +1,9 @@
+---
+title: "Limitations"
+description: "What agent-traffic can't tell you."
+---
+
+- **Agents inside a person's browser are invisible at the HTTP level.** Agentic browsers and extensions that run in a person's own browser send that browser's requests.
+- **Some products share an identity.** Codex has been reported to fetch as `ChatGPT-User`, and Cursor through Exa as `ExaUser`. Results name only what can be proven.
+- **Logs lose information.** Classifying stored logs from the user agent alone can't catch agents that borrow a browser user agent. See [Querying your logs](/guides/querying-logs).
+- **Very old browsers and feature phones count as bots.** User agents without a modern rendering-engine token, like Amiga browsers or MIDP phones, fall through to `bot`.

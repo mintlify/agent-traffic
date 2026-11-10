@@ -1,0 +1,101 @@
+---
+title: "classify"
+description: "Classify a single request."
+---
+
+```ts
+classify(request: RequestInput, options?: ClassifyOptions): Classification
+```
+
+## Request
+
+<ParamField path="userAgent" type="string">
+  The user agent. Read from `headers` when omitted.
+</ParamField>
+
+<ParamField path="headers" type="Headers | Record<string, string | string[]>">
+  Request headers, in any casing.
+</ParamField>
+
+<ParamField path="ip" type="string | null">
+  The real client IP. Ports and IPv4-mapped IPv6 addresses are handled. Anything that isn't a single valid address skips verification.
+</ParamField>
+
+## Options
+
+<ParamField path="ipRanges" type="IpRanges">
+  The result of [`loadIpRanges()`](/reference/load-ip-ranges). Turns on IP verification and impersonator detection.
+</ParamField>
+
+<ParamField path="headersComplete" type="boolean" default="false">
+  Set when browser headers reach you untouched over HTTPS. Turns on the `sec-fetch-*`, `sec-ch-ua` and `Accept-Language` checks.
+</ParamField>
+
+<ParamField path="maxRangeAgeDays" type="number" default="180">
+  An operator's range file older than this can still verify a request, but never flags one as an impersonator.
+</ParamField>
+
+<ParamField path="now" type="Date">
+  Overrides the current time, for tests.
+</ParamField>
+
+## Returns
+
+<ResponseField name="category" type="'agent' | 'ai-crawler' | 'crawler' | 'bot' | 'human' | 'unknown'" required>
+  See [Categories](/concepts/categories).
+</ResponseField>
+
+<ResponseField name="kind" type="string">
+  Detail within the category, such as `coding`, `training` or `http-client`.
+</ResponseField>
+
+<ResponseField name="id" type="string">
+  The matched dataset entry, such as `claude-code` or `gptbot`.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The product's display name.
+</ResponseField>
+
+<ResponseField name="operator" type="string">
+  The company that runs it.
+</ResponseField>
+
+<ResponseField name="version" type="string">
+  The product version, when the user agent carries one.
+</ResponseField>
+
+<ResponseField name="verified" type="boolean | null" required>
+  `true` when the IP is in the operator's published ranges, `false` when it provably isn't who it claims to be, and `null` when it wasn't checked or can't be.
+</ResponseField>
+
+<ResponseField name="confidence" type="'high' | 'medium' | 'low'" required>
+  See [Confidence](/concepts/confidence).
+</ResponseField>
+
+<ResponseField name="reasons" type="string[]" required>
+  Plain-English explanations of how the request was classified.
+</ResponseField>
+
+## Example
+
+```js
+classify({ userAgent: 'Claude-User (claude-code/2.1.308; +https://support.anthropic.com/)' })
+```
+
+```json
+{
+  "category": "agent",
+  "kind": "coding",
+  "id": "claude-code",
+  "name": "Claude Code",
+  "operator": "Anthropic",
+  "version": "2.1.308",
+  "verified": null,
+  "confidence": "medium",
+  "reasons": [
+    "user agent matches Claude Code",
+    "Claude Code runs on the user's machine, so IP verification does not apply"
+  ]
+}
+```

@@ -1,0 +1,44 @@
+---
+title: "Categories"
+description: "What each category and kind means, and how to tell them apart."
+---
+
+Every request gets exactly one `category`, plus a `kind` with more detail.
+
+| Category | Definition | Examples |
+|---|---|---|
+| `agent` | An AI product fetching a page **now, on behalf of a person** | Claude Code, ChatGPT-User, Perplexity-User, GitHub Copilot, Google-Agent |
+| `ai-crawler` | An AI company collecting pages **ahead of time**, for training, an AI search index or a knowledge base | GPTBot, ClaudeBot, OAI-SearchBot, PerplexityBot, ExaSearchBot, Context7 |
+| `crawler` | A search engine crawler | Googlebot, Bingbot, Applebot, YandexBot |
+| `bot` | Any other automation | AhrefsBot, Slackbot, uptime monitors, curl, python-requests |
+| `human` | A person using a browser | |
+| `unknown` | Nothing to classify: no user agent and no headers | |
+
+## Agent or AI crawler?
+
+Ask whether a person is waiting on this request. If someone is, it's an `agent`. If it would have happened anyway on a schedule, it's an `ai-crawler`.
+
+Search engines whose index also feeds AI answers, like Googlebot and Bingbot, stay `crawler`. Their main job is search, and their operators document them that way.
+
+## Kinds
+
+| Category | Kinds |
+|---|---|
+| `agent` | `assistant` (chat products), `coding` (IDE and CLI agents), `browser` (agents that drive a browser), `unidentified` (agent behavior but no known product) |
+| `ai-crawler` | `training`, `ai-search`, `ingest` (knowledge bases and retrieval pipelines) |
+| `crawler` | `search` |
+| `bot` | `seo`, `preview`, `ads`, `monitor`, `scanner`, `archiver`, `feed`, `http-client`, `headless`, `fake-browser`, `impersonator`, `unidentified` |
+
+## Edge cases
+
+<AccordionGroup>
+  <Accordion title="A script fetching my markdown">
+    Scripts, docs mirrors and integrations fetch `.md` and `llms.txt` files too. A request counts as an `agent` only if it identifies itself as one or asks for markdown in its `Accept` header. A bare `curl` or `axios` request is a `bot` with kind `http-client`.
+  </Accordion>
+  <Accordion title="Native apps">
+    An app's own HTTP stack (`CFNetwork`, `Dalvik`, `okhttp`) fetches pages programmatically, even when a person is using the app, so it's a `bot`. Pages opened in an app's built-in browser, like the Twitter or LinkedIn apps or an iOS web view, use a browser user agent and count as `human`.
+  </Accordion>
+  <Accordion title="Platforms that fetch for other products">
+    Some agents fetch through another company's infrastructure. Cursor's web fetches have been reported to go through Exa as `ExaUser`, and Codex through OpenAI as `ChatGPT-User`. The result names the identity it can prove, and the entry's `notes` record known cases.
+  </Accordion>
+</AccordionGroup>

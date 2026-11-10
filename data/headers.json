@@ -1,0 +1,62 @@
+[
+  {
+    "header": "user-agent",
+    "controlledBy": "client",
+    "meaning": "The client's claimed identity. Match it against agents.json, then http-clients.json.",
+    "usedBy": "classify"
+  },
+  {
+    "header": "accept",
+    "controlledBy": "client",
+    "meaning": "Browsers never rank text/markdown or text/x-markdown above text/html, and never rank text/plain first. A request that prefers markdown comes from AI tooling. Some tools send a distinctive Accept string, listed under an agent's accept field.",
+    "usedBy": "classify"
+  },
+  {
+    "header": "signature-agent",
+    "controlledBy": "client",
+    "meaning": "Names the operator of a Web Bot Auth signed request, e.g. chatgpt.com. It is a claim until the Signature and Signature-Input headers are verified against that operator's key directory.",
+    "usedBy": "classify"
+  },
+  {
+    "header": "signature",
+    "controlledBy": "client",
+    "meaning": "RFC 9421 HTTP message signature. Proves the operator when it validates against the key directory in agents.json verify.webBotAuth.",
+    "usedBy": "classify, as a requirement for using signature-agent"
+  },
+  {
+    "header": "signature-input",
+    "controlledBy": "client",
+    "meaning": "Signature parameters. Web Bot Auth requests use tag=\"web-bot-auth\".",
+    "usedBy": "classify, as a requirement for using signature-agent"
+  },
+  {
+    "header": "sec-fetch-mode",
+    "controlledBy": "browser",
+    "meaning": "Every current browser sends sec-fetch-mode, sec-fetch-site and sec-fetch-dest on HTTPS requests. A browser user agent without them is not a browser.",
+    "usedBy": "classify, only when headersComplete is true"
+  },
+  {
+    "header": "sec-ch-ua",
+    "controlledBy": "browser",
+    "meaning": "Sent by Chromium-based browsers only. On a Firefox or Safari user agent it means the user agent is fake.",
+    "usedBy": "classify, only when headersComplete is true"
+  },
+  {
+    "header": "accept-language",
+    "controlledBy": "browser",
+    "meaning": "Browsers always send it. Its absence on a browser user agent points to automation.",
+    "usedBy": "classify, only when headersComplete is true"
+  },
+  {
+    "header": "from",
+    "controlledBy": "client",
+    "meaning": "Some crawlers put a contact address here. Its presence points to automation.",
+    "usedBy": "classify"
+  },
+  {
+    "header": "cf-connecting-ip",
+    "controlledBy": "your proxy",
+    "meaning": "The real client IP when you sit behind Cloudflare. Use your own proxy's header for IP verification; never the leftmost X-Forwarded-For value, which the client can set.",
+    "usedBy": "caller passes it as ip"
+  }
+]

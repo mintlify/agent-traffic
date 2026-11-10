@@ -1,0 +1,61 @@
+---
+title: "Install it yourself"
+description: "Add the agent-traffic package to your code by hand."
+---
+
+Prefer to wire it in yourself? Install the package directly. To have your agent do this instead, see the [Quickstart](/use-with-agents).
+
+<Steps>
+  <Step title="Install the package">
+    ```bash
+    npm i @mintlify/agent-traffic
+    ```
+
+    It has no dependencies and runs anywhere `fetch` does: Node 20.10+, Bun, Deno, Cloudflare Workers and Vercel Edge.
+  </Step>
+  <Step title="Classify a user agent">
+    ```js
+    import { classify } from '@mintlify/agent-traffic'
+
+    classify({ userAgent: 'axios/1.13.2' })
+    // { category: 'bot', kind: 'http-client', name: 'axios', verified: null, confidence: 'medium',
+    //   reasons: ['user agent is axios'] }
+    ```
+
+    The user agent alone is enough for logs and quick checks.
+  </Step>
+  <Step title="Classify a full request">
+    Pass the request headers and the real client IP to unlock header checks and verification:
+
+    ```js
+    import { classify, loadIpRanges } from '@mintlify/agent-traffic'
+
+    const ipRanges = await loadIpRanges()
+
+    const result = classify(
+      { headers: request.headers, ip: request.headers.get('cf-connecting-ip') },
+      { ipRanges }
+    )
+    ```
+
+    A spoofed crawler now comes back as an impersonator:
+
+    ```js
+    // { category: 'bot', kind: 'impersonator', verified: false, confidence: 'high',
+    //   reasons: ["claims to be GPTBot but 73.12.4.9 is outside OpenAI's published ranges"] }
+    ```
+  </Step>
+  <Step title="Act on the category">
+    ```js
+    if (result.category === 'agent') {
+      // serve markdown, log it, meter it
+    }
+    ```
+
+    See [Categories](/concepts/categories) for what each value means.
+  </Step>
+</Steps>
+
+<Note>
+  On Cloudflare Workers, load IP ranges inside the request handler rather than at the top of the module. Workers don't allow `fetch` at global scope. See [Request-time classification](/guides/request-time).
+</Note>

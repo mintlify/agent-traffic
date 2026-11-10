@@ -1,0 +1,49 @@
+---
+title: "Querying your logs"
+description: "Classify traffic you've already stored."
+---
+
+The fastest way is to [point your coding agent at the skill](/use-with-agents). It chooses an approach for your stack, translates the patterns for your database, and tests the result.
+
+## Lookup table
+
+To do it yourself, classify each distinct user agent once with the real package, then join the results. Logs hold far fewer distinct user agents than requests, so this is fast, and it gives exactly the same answers as request-time classification.
+
+```js
+import { classify } from '@mintlify/agent-traffic'
+
+const rows = distinctUserAgents.map((ua) => ({ user_agent: ua, ...classify({ userAgent: ua }) }))
+```
+
+Load `user_agent, category, kind, id, name, operator` into a table and join on it:
+
+```sql
+SELECT c.category, c.kind, count(*) AS requests
+FROM logs l
+JOIN user_agent_classes c USING (user_agent)
+GROUP BY 1, 2
+```
+
+Re-run it on a schedule to pick up new user agents and dataset updates.
+
+## Generated SQL
+
+When a lookup table isn't practical, generate a `CASE` expression from the dataset, with one `WHEN` per pattern:
+
+1. every `agents.json` entry, in file order;
+2. then every `http-clients.json` entry.
+
+Generate it with a script, and regenerate it whenever the dataset changes. Don't copy patterns by hand.
+
+| Engine | Match expression | Translation |
+|---|---|---|
+| ClickHouse | `match(ua, '(?i)<pattern>')` | none |
+| DuckDB | `regexp_matches(ua, '<pattern>', 'i')` | replace `(?<name>` with `(?:` |
+| Postgres | `ua ~* '<pattern>'` | replace `(?<name>` with `(?:`, and `\b` with `\y` |
+| BigQuery, Snowflake, others | check the engine's regex docs | test every pattern first |
+
+The first three were verified against every example in the dataset.
+
+<Warning>
+  Logs usually keep only the user agent. That still identifies known agents, crawlers and HTTP clients, but agents that borrow a browser user agent will look like people unless you also logged the `Accept` header.
+</Warning>

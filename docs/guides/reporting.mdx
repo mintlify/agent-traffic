@@ -1,0 +1,25 @@
+---
+title: "Reporting agent traffic"
+description: "Turn classifications into numbers that mean what people think they mean."
+---
+
+## Keep agents and crawlers separate
+
+Crawler volume is scheduled and usually far larger than agent volume. Adding the two together hides how much on-demand agent use you really have.
+
+## Don't count every markdown fetch as an agent
+
+Scripts, documentation mirrors and integrations fetch `.md` and `llms.txt` files constantly. A markdown fetch by `curl`, `axios` or a custom script is a `bot`, unless it identifies itself or asks for markdown in `Accept`.
+
+## Say what's verified
+
+Without a real client IP, every identity is self-declared. Report verified numbers only when you classified at request time with IP ranges loaded.
+
+## Replacing an existing metric
+
+If you already show an "AI traffic" number, a stricter definition will usually shrink it. Instead of changing the headline overnight, report two numbers:
+
+- **Broad:** `agent` plus `ai-crawler`, plus automated reads of `.md` and `llms.txt`.
+- **Narrow:** `agent` only, the traffic where a person is waiting.
+
+Explain the difference next to the chart.

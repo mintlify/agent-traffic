@@ -1,0 +1,27 @@
+---
+title: "loadIpRanges"
+description: "Download operators' published IP ranges for verification."
+---
+
+```ts
+loadIpRanges(fetch?: typeof globalThis.fetch): Promise<IpRanges>
+```
+
+Downloads every IP range file listed in the dataset and returns them keyed by URL, each with its CIDRs and creation date. Pass the result to [`classify`](/reference/classify) as `ipRanges`.
+
+<ParamField path="fetch" type="typeof fetch" default="globalThis.fetch">
+  A custom `fetch` implementation, for proxies or tests.
+</ParamField>
+
+- **When to call it:** call it once, then refresh about daily in long-running processes.
+- **Failed files:** a file that fails to download or contains no ranges is skipped. Requests from that operator then come back unverified rather than flagged.
+- **Cloudflare Workers:** call it inside the request handler, not at module scope.
+
+```js
+let ipRanges
+
+async function handle(request) {
+  ipRanges ??= await loadIpRanges()
+  return classify({ headers: request.headers, ip: request.headers.get('cf-connecting-ip') }, { ipRanges })
+}
+```

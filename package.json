@@ -1,0 +1,49 @@
+{
+  "name": "@mintlify/agent-traffic",
+  "version": "0.1.0",
+  "description": "Tell agents, AI crawlers, search crawlers and bots apart from people",
+  "keywords": [
+    "ai",
+    "agents",
+    "crawlers",
+    "bots",
+    "user-agent",
+    "llm",
+    "gptbot",
+    "claudebot",
+    "web-bot-auth",
+    "analytics"
+  ],
+  "license": "MIT",
+  "author": "Mintlify (https://mintlify.com)",
+  "repository": "github:mintlify/agent-traffic",
+  "homepage": "https://github.com/mintlify/agent-traffic#readme",
+  "bugs": "https://github.com/mintlify/agent-traffic/issues",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./data/*.json": "./dist/data/*.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": ["dist", "skills", "GUIDELINES.md"],
+  "engines": {
+    "node": ">=20.10"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "type": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/*.test.ts",
+    "prepublishOnly": "pnpm type && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  },
+  "packageManager": "pnpm@12.4.0"
+}

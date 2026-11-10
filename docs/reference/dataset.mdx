@@ -1,0 +1,47 @@
+---
+title: "Dataset"
+description: "The JSON files behind the classifier."
+---
+
+The dataset is plain JSON, so you can use it from any language or SQL engine. Import it from the package or read it from the repository.
+
+```js
+import { agents, httpClients, headers } from '@mintlify/agent-traffic'
+import agentsJson from '@mintlify/agent-traffic/data/agents.json' with { type: 'json' }
+```
+
+| File | Contents |
+|---|---|
+| [`agents.json`](https://github.com/mintlify/agent-traffic/blob/main/data/agents.json) | Known agents, AI crawlers, search crawlers and named bots |
+| [`http-clients.json`](https://github.com/mintlify/agent-traffic/blob/main/data/http-clients.json) | Generic HTTP libraries, native-app HTTP stacks and headless browsers |
+| [`headers.json`](https://github.com/mintlify/agent-traffic/blob/main/data/headers.json) | What each request header tells you and who controls it |
+
+## Agent entries
+
+```json
+{
+  "id": "gptbot",
+  "name": "GPTBot",
+  "operator": "OpenAI",
+  "category": "ai-crawler",
+  "kind": "training",
+  "runsOn": "operator",
+  "userAgents": ["\\bGPTBot/"],
+  "verify": { "ipRanges": ["https://openai.com/gptbot.json"] },
+  "docs": "https://platform.openai.com/docs/bots",
+  "examples": ["Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.4; +https://openai.com/gptbot)"],
+  "lastVerified": "2026-10-23"
+}
+```
+
+<ResponseField name="id" type="string" required>Stable identifier, returned as `id` by `classify`.</ResponseField>
+<ResponseField name="category" type="string" required>`agent`, `ai-crawler`, `crawler` or `bot`.</ResponseField>
+<ResponseField name="kind" type="string" required>Detail within the category.</ResponseField>
+<ResponseField name="runsOn" type="'operator' | 'user'" required>Where requests come from. `user` entries are never IP-checked.</ResponseField>
+<ResponseField name="userAgents" type="string[]" required>Case-insensitive regular expressions anchored on the product token. A `(?<version>…)` group fills `version`.</ResponseField>
+<ResponseField name="accept" type="string[]">Exact `Accept` strings the product sends.</ResponseField>
+<ResponseField name="signatureAgent" type="string[]">Hosts named in the product's `Signature-Agent` header.</ResponseField>
+<ResponseField name="verify" type="object">Operator-published sources: `ipRanges` URLs, `reverseDns` domains and a `webBotAuth` key directory.</ResponseField>
+<ResponseField name="examples" type="string[]" required>Real user agents. The tests require each to classify as its own entry and match no other.</ResponseField>
+<ResponseField name="notes" type="string">Caveats, such as shared identities.</ResponseField>
+<ResponseField name="lastVerified" type="string" required>The date the entry was last confirmed.</ResponseField>

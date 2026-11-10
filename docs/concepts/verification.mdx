@@ -1,0 +1,39 @@
+---
+title: "Verification"
+description: "How agent-traffic turns a claimed identity into a checked one."
+---
+
+User agents and headers are set by the client, so anyone can claim to be GPTBot. Operators that fetch from their own servers publish the IP ranges they use, which turns a claim into something you can check.
+
+| Outcome | When | Result |
+|---|---|---|
+| Verified | The IP is inside the operator's published ranges | `verified: true`, confidence `high` |
+| Impersonator | The IP is outside the ranges, and the range file is current | `category: 'bot'`, `kind: 'impersonator'`, `verified: false` |
+| Unverified | No IP, an IP that isn't a single valid address, no published ranges, or a range file that's empty or older than 180 days | The claim is accepted with `verified: null` |
+
+An unusable input never turns a real crawler into a suspected fake.
+
+## Agents that run on the user's machine
+
+Coding agents like Claude Code, OpenCode, Cursor and GitHub Copilot fetch from the developer's own computer, so their IPs will never be in the vendor's ranges. These entries are marked `"runsOn": "user"` and are never IP-checked.
+
+## Use the real client IP
+
+Behind a CDN or proxy, read the IP from the header your own proxy sets, such as `CF-Connecting-IP` on Cloudflare. The leftmost `X-Forwarded-For` value is set by the client, so it proves nothing.
+
+Ports and IPv4-mapped IPv6 addresses (`::ffff:1.2.3.4`) are normalized before checking. A comma-separated chain is treated as unusable and skips verification.
+
+## Where the ranges come from
+
+[`loadIpRanges()`](/reference/load-ip-ranges) downloads the files published by these operators:
+
+- OpenAI
+- Anthropic
+- Google
+- Perplexity
+- Apple
+- Microsoft
+- Common Crawl
+- DuckDuckGo
+
+Refresh them about once a day.

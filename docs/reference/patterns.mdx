@@ -1,0 +1,36 @@
+---
+title: "patterns and userAgents"
+description: "The dataset's user agent patterns, grouped by category."
+---
+
+For a quick check without the full classifier, each category is available as a single case-insensitive regular expression:
+
+```js
+import { patterns } from '@mintlify/agent-traffic'
+
+patterns.agent.test(userAgent)
+patterns['ai-crawler'].test(userAgent)
+patterns.crawler.test(userAgent)
+patterns.bot.test(userAgent)
+```
+
+`userAgents` holds the same patterns as arrays of strings, for building your own matchers:
+
+```js
+import { userAgents } from '@mintlify/agent-traffic'
+
+userAgents.agent
+// ['^Claude-User \\(claude-code/(?<version>[\\d.]+)', '\\bGitHubCopilot[\\w-]*', ...]
+```
+
+<Note>
+  These match user agents only. Use [`classify`](/reference/classify) for verification, `Accept` fingerprints and browser header checks.
+</Note>
+
+## prefersMarkdown
+
+```ts
+prefersMarkdown(accept: string): boolean
+```
+
+Returns `true` when an `Accept` header ranks `text/markdown` or `text/x-markdown` above `text/html`, taking `q` values into account.

@@ -1,0 +1,29 @@
+---
+title: "Contributing"
+description: "Add or fix an agent in the dataset."
+---
+
+Agents change their fetchers often. If you see one that's missing or wrong, open a pull request against [`data/agents.json`](https://github.com/mintlify/agent-traffic/blob/main/data/agents.json).
+
+<Steps>
+  <Step title="Pick the category">
+    Follow [Categories](/concepts/categories). If you're unsure, ask whether a person is waiting on this request right now. If one is, it's an `agent`.
+  </Step>
+  <Step title="Write an anchored pattern">
+    Patterns are case-insensitive regular expressions anchored on the product token. Bare words like `Cursor` or `Code` aren't accepted, because they match unrelated software.
+  </Step>
+  <Step title="Add real examples">
+    Include at least one real user agent from traffic or the operator's documentation. Don't invent one, but replace anything that identifies a customer, like tenant or scan IDs, with a placeholder.
+  </Step>
+  <Step title="Link verification sources">
+    Only list sources the operator publishes: IP range JSON, reverse DNS domains or a Web Bot Auth key directory. Use `"runsOn": "user"` for products that fetch from the user's machine.
+  </Step>
+  <Step title="Run the tests">
+    ```bash
+    pnpm install
+    pnpm test
+    ```
+
+    The tests check that every example classifies as its own entry and matches no other.
+  </Step>
+</Steps>

@@ -1,0 +1,54 @@
+---
+title: "Introduction"
+description: "Tell agents, AI crawlers, search crawlers and bots apart from people."
+---
+
+`agent-traffic` classifies HTTP requests. It's a curated, tested dataset of the user agents, headers and official verification sources of real agents and crawlers, plus one small function that applies it.
+
+## Get started with your agent
+
+Install the skill in Claude Code, Cursor, Codex or any coding agent. It teaches your agent how agent-traffic works and how to use it, so you can ask for whatever you need.
+
+<Prompt description="Install the agent-traffic skill" icon="robot">
+Install the agent-traffic skill with `npx skills add mintlify/agent-traffic`.
+</Prompt>
+
+<Card title="Quickstart" icon="robot" href="/use-with-agents" horizontal>
+  Other ways to install and what the skill covers.
+</Card>
+
+## What it does
+
+```js
+import { classify } from '@mintlify/agent-traffic'
+
+classify({ userAgent: 'Claude-User (claude-code/2.1.308; +https://support.anthropic.com/)' })
+// { category: 'agent', kind: 'coding', name: 'Claude Code', operator: 'Anthropic', version: '2.1.308', ... }
+```
+
+## Why it exists
+
+Most bot lists match a user agent substring and return a label. That breaks down for AI traffic in three ways:
+
+- **Claims aren't verified.** Anyone can send `GPTBot` in a user agent. `agent-traffic` checks crawlers against their operators' published IP ranges and flags impersonators.
+- **Different kinds of AI traffic get lumped together.** A coding agent reading your docs for a developer, an AI company crawling for training data, and a script mirroring your `llms.txt` are very different things. Each gets its own category.
+- **Agents hide behind browser user agents.** Many AI tools send a stock Chrome user agent but still ask for markdown. The classifier looks at headers, not only the user agent.
+
+Every result explains itself with a list of reasons, so you can see why a request landed where it did.
+
+## Start here
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="robot" href="/use-with-agents">
+    Have your coding agent add classification to your stack.
+  </Card>
+  <Card title="Install it yourself" icon="code" href="/quickstart">
+    Add the package to your code by hand.
+  </Card>
+  <Card title="Categories" icon="layer-group" href="/concepts/categories">
+    What `agent`, `ai-crawler`, `crawler`, `bot` and `human` mean.
+  </Card>
+  <Card title="Querying your logs" icon="database" href="/guides/querying-logs">
+    Classify traffic you've already stored.
+  </Card>
+</CardGroup>

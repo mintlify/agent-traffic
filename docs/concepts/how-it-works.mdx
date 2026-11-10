@@ -1,0 +1,50 @@
+---
+title: "How classification works"
+description: "The checks agent-traffic runs, in order."
+---
+
+Checks run in order, and the first one that answers wins.
+
+<Steps>
+  <Step title="Known agent or crawler">
+    The request is matched against [`agents.json`](/reference/dataset) in this order:
+
+    - the `User-Agent` header;
+    - an exact `Accept` fingerprint, compared ignoring case and spacing;
+    - the `Signature-Agent` header, but only on requests that also carry `Signature` and `Signature-Input`.
+
+    When the match runs on its operator's servers and you pass the client IP, the IP is checked too. See [Verification](/concepts/verification).
+  </Step>
+  <Step title="Asks for markdown">
+    If `Accept` ranks `text/markdown` or `text/x-markdown` above `text/html`, the request is an `agent`. Browsers never do this; AI tools that read pages do.
+  </Step>
+  <Step title="Generic HTTP client or headless browser">
+    The user agent is matched against [`http-clients.json`](/reference/dataset). A match is a `bot`, with kind `http-client` or `headless`.
+  </Step>
+  <Step title="Browser">
+    A user agent counts as a browser when all of these hold:
+
+    - it starts with `Mozilla/`;
+    - it carries a rendering-engine token such as `KHTML, like Gecko`, `Gecko/` or `Trident/`;
+    - it shows no sign of automation, such as a `bot` token, a URL, an email address, or a testing tool's name.
+
+    Browsers are `human` unless their headers contradict it (see below).
+  </Step>
+  <Step title="Everything else">
+    Anything else is a `bot` with kind `unidentified`. That includes empty user agents, truncated browser strings and one-off scripts. `unknown` is reserved for requests with no user agent and no headers at all.
+  </Step>
+</Steps>
+
+## Browser checks
+
+Real browsers send a predictable set of headers. Many automated clients that borrow a browser user agent don't. A browser user agent becomes a `fake-browser` bot when:
+
+- `Accept` ranks `text/plain` above `text/html`, or asks for metalink downloads. This is checked whenever `Accept` is present.
+- These three are checked only when you pass `headersComplete: true`:
+  - a recent Chrome, Firefox or Safari sends no `sec-fetch-*` headers;
+  - a Firefox or Safari user agent sends `sec-ch-ua`, which only Chromium-based browsers send;
+  - there's no `Accept-Language`.
+
+<Warning>
+  Only set `headersComplete: true` for HTTPS traffic that reaches you unmodified. Browsers don't send `sec-fetch-*` over plain HTTP, and some proxies strip it.
+</Warning>
