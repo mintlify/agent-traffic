@@ -14,19 +14,23 @@ Classify at the first hop that sees the real request, usually your CDN or edge w
 
     export default {
       async fetch(request) {
-        ipRanges ??= await loadIpRanges()
+        ipRanges ??= loadIpRanges()
 
         const result = classify(
           { headers: request.headers, ip: request.headers.get('cf-connecting-ip') },
-          { ipRanges, headersComplete: true }
+          { ipRanges: await ipRanges, headersComplete: true }
         )
+
+        if (result.category === 'agent') {
+          return serveMarkdown(request)
+        }
 
         return fetch(request)
       }
     }
     ```
 
-    Workers don't allow `fetch` at global scope, so the ranges load on the first request.
+    Workers don't allow `fetch` at global scope, so the ranges load on the first request. Caching the promise rather than the result keeps concurrent first requests from each downloading them.
   </Tab>
   <Tab title="Next.js middleware">
     ```js

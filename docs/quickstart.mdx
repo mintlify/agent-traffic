@@ -1,61 +1,34 @@
 ---
-title: "Install it yourself"
-description: "Add the agent-traffic package to your code by hand."
+title: "Quickstart"
+description: "Install the agent-traffic skill so your coding agent knows how to classify traffic."
 ---
 
-Prefer to wire it in yourself? Install the package directly. To have your agent do this instead, see the [Quickstart](/use-with-agents).
+agent-traffic ships a skill that teaches your coding agent how classification works and how to use the package and dataset. Install it, then ask your agent for whatever you need.
 
-<Steps>
-  <Step title="Install the package">
-    ```bash
-    npm i @mintlify/agent-traffic
-    ```
+<Prompt description="Install the agent-traffic skill" icon="robot">
+Install the agent-traffic skill with `npx skills add mintlify/agent-traffic`.
+</Prompt>
 
-    It has no dependencies and runs anywhere `fetch` does: Node 20.10+, Bun, Deno, Cloudflare Workers and Vercel Edge.
-  </Step>
-  <Step title="Classify a user agent">
-    ```js
-    import { classify } from '@mintlify/agent-traffic'
+The skill installs through the [skills CLI](https://skills.sh), which supports Claude Code, Cursor, Codex, OpenCode and other agents.
 
-    classify({ userAgent: 'axios/1.13.2' })
-    // { category: 'bot', kind: 'http-client', name: 'axios', verified: null, confidence: 'medium',
-    //   reasons: ['user agent is axios'] }
-    ```
+## Other ways to install
 
-    The user agent alone is enough for logs and quick checks.
-  </Step>
-  <Step title="Classify a full request">
-    Pass the request headers and the real client IP to unlock header checks and verification:
+<Tabs>
+  <Tab title="Point your agent at it">
+    If you'd rather not install anything, give your agent the skill's URL:
 
-    ```js
-    import { classify, loadIpRanges } from '@mintlify/agent-traffic'
+    <Prompt description="Use the skill without installing it" icon="link">
+    Read https://github.com/mintlify/agent-traffic/blob/main/skills/agent-traffic/SKILL.md to learn how to use agent-traffic.
+    </Prompt>
+  </Tab>
+  <Tab title="npm package">
+    The skill ships inside the package at `node_modules/@mintlify/agent-traffic/skills/agent-traffic/SKILL.md`. Copy it into `.claude/skills/` or wherever your agent loads skills from.
+  </Tab>
+</Tabs>
 
-    const ipRanges = await loadIpRanges()
+## What the skill covers
 
-    const result = classify(
-      { headers: request.headers, ip: request.headers.get('cf-connecting-ip') },
-      { ipRanges }
-    )
-    ```
-
-    A spoofed crawler now comes back as an impersonator:
-
-    ```js
-    // { category: 'bot', kind: 'impersonator', verified: false, confidence: 'high',
-    //   reasons: ["claims to be GPTBot but 73.12.4.9 is outside OpenAI's published ranges"] }
-    ```
-  </Step>
-  <Step title="Act on the category">
-    ```js
-    if (result.category === 'agent') {
-      // serve markdown, log it, meter it
-    }
-    ```
-
-    See [Categories](/concepts/categories) for what each value means.
-  </Step>
-</Steps>
-
-<Note>
-  On Cloudflare Workers, load IP ranges inside the request handler rather than at the top of the module. Workers don't allow `fetch` at global scope. See [Request-time classification](/guides/request-time).
-</Note>
+- **How classification works:** the categories, the order of checks, and when an identity counts as verified.
+- **How to use it in different places:** the package in JavaScript request handlers, porting the rules to other languages, and querying stored logs with a lookup table or generated SQL, with pattern translations per database.
+- **How to check the result:** running the dataset's real example user agents through whatever your agent builds.
+- **How to report the numbers:** keeping agents and crawlers separate, and what to do when replacing an existing metric.

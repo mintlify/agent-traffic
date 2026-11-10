@@ -43,8 +43,8 @@ import { classify, loadIpRanges } from '@mintlify/agent-traffic'
 let ipRanges
 
 async function classifyRequest(request) {
-  ipRanges ??= await loadIpRanges()
-  return classify({ headers: request.headers, ip: request.headers.get('cf-connecting-ip') }, { ipRanges })
+  ipRanges ??= loadIpRanges()
+  return classify({ headers: request.headers, ip: request.headers.get('cf-connecting-ip') }, { ipRanges: await ipRanges })
 }
 ```
 

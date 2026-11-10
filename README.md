@@ -43,7 +43,7 @@ npm i @mintlify/agent-traffic
 
 ## Usage
 
-At the edge, pass the request headers and the real client IP:
+In a Cloudflare Worker, pass the request headers and the real client IP:
 
 ```js
 import { classify, loadIpRanges } from '@mintlify/agent-traffic'
@@ -52,19 +52,23 @@ let ipRanges
 
 export default {
   async fetch(request) {
-    ipRanges ??= await loadIpRanges()
+    ipRanges ??= loadIpRanges()
 
     const result = classify(
       { headers: request.headers, ip: request.headers.get('cf-connecting-ip') },
-      { ipRanges, headersComplete: true }
+      { ipRanges: await ipRanges, headersComplete: true }
     )
 
     if (result.category === 'agent') {
-      // serve markdown, log it, meter it...
+      return serveMarkdown(request)
     }
+
+    return fetch(request)
   }
 }
 ```
+
+The ranges load on the first request because Workers can't fetch at startup, and caching the promise keeps concurrent requests from each downloading them. `headersComplete` turns on the fake-browser checks, which is safe when browser headers reach the Worker untouched over HTTPS; leave it off if plain HTTP or a proxy in front can strip them.
 
 Someone spoofing a crawler gets caught:
 

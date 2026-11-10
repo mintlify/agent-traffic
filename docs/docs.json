@@ -13,7 +13,7 @@
     "groups": [
       {
         "group": "Get started",
-        "pages": ["index", "use-with-agents", "quickstart"]
+        "pages": ["index", "quickstart", "install"]
       },
       {
         "group": "Concepts",
