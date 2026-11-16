@@ -348,6 +348,23 @@
     "lastVerified": "2026-10-23"
   },
   {
+    "id": "meta-muse-hatchfeed",
+    "name": "Muse (HatchFeed)",
+    "operator": "Meta",
+    "category": "agent",
+    "kind": "assistant",
+    "runsOn": "operator",
+    "userAgents": [
+      "\\bHatchFeed/(?<version>[\\d.]+)"
+    ],
+    "docs": "https://agent.meta.ai",
+    "examples": [
+      "HatchFeed/1.0 (+https://agent.meta.ai; link preview)"
+    ],
+    "notes": "Link-preview fetcher of Meta's Muse agent; agent.meta.ai redirects to muse.ai. Seen from Cloudflare IPv6 2606:54c1:1::/48 together with a Web Bot Auth signed meta-webindexer request (Signature-Agent www.meta.com) and a HEAD request with a stock Chrome/138 Linux user agent. Never requests robots.txt.",
+    "lastVerified": "2026-11-16"
+  },
+  {
     "id": "amazon-quick",
     "name": "Amazon Quick",
     "operator": "Amazon",
